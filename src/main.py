@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from opensimplex import OpenSimplex
 import pygame
 pygame.init();
 
@@ -18,24 +19,50 @@ def generateMap() :
 # to represent the map in terms of its height
 def generateHeightMap() :
     heightMap = []
-    for y in range(0, int(HEIGHT / TILE_SIZE)) :
+    for y in range(0, int(MAP_SIZE)) :
         row = []
-        for x in range(0, int(WIDTH / TILE_SIZE)):
-            row.append(0.0)
+        for x in range(0, int(MAP_SIZE)):
+            row.append(scale(genHeight(x, y)))
         heightMap.append(row)
     return heightMap
 
-# Generates a 2d lisst of tile objects based on
+# Generates a float using noise function
+# range is from MIN_SCALE to MAX_SCALE inclusive
+def genHeight(x, y):
+    n1 = 0.75 * (noise.noise2d(FREQUENCY * x, FREQUENCY * y) + 1) / 2
+    n2 = 0.20 * (noise.noise2d(2 * FREQUENCY * x, 2 * FREQUENCY * y) + 1) / 2
+    n3 = 0.05 * (noise.noise2d(4 * FREQUENCY * x, 4 * FREQUENCY * y) + 1) / 2
+    e = (n1 + n2 + n3) + LAND_CONST - (WATER_CONST * pow(dist(x, y) /
+    MANHATTAN_DIST, DROP_CONST))
+    return pow(e, POW_CONST)
+
+# Calculates the manhattan distance given the x and y
+def dist(x, y):
+    return abs((MAP_SIZE / 2) - x) + abs((MAP_SIZE / 2) - y)
+
+# Scales a value from MIN_SCALE to MAX_SCALE
+def scale(val):
+    return int(val * (MAX_SCALE - MIN_SCALE) + MIN_SCALE)
+
+# Generates a 2d list of tile objects based on
 # the height map given as a parameter
 def generateTileMap(heightMap) :
     tileMap = []
     for y in range(len(heightMap)) :
         tileRow = []
         for x in range(len(heightMap[y])) :
-            if(heightMap[y][x] > 0.0) :
-                tileRow.append(LandTile(x, y, heightMap[y][x]))
-            else :
+            if(heightMap[y][x] <= WATER_LEVEL) :
                 tileRow.append(OceanTile(x, y, heightMap[y][x]))
+            elif(heightMap[y][x] <= BEACH_LEVEL) :
+                tileRow.append(BeachTile(x, y, heightMap[y][x]))
+            elif(heightMap[y][x] <= PLAIN_LEVEL) :
+                tileRow.append(PlainTile(x, y, heightMap[y][x]))
+            elif(heightMap[y][x] <= JUNGLE_LEVEL) :
+                tileRow.append(JungleTile(x, y, heightMap[y][x]))
+            elif(heightMap[y][x] <= MOUNTAIN_LEVEL) :
+                tileRow.append(MountainTile(x, y, heightMap[y][x]))
+            else :
+                tileRow.append(SnowTile(x, y, heightMap[y][x]))
         tileMap.append(tileRow)
     return tileMap
 
@@ -89,21 +116,63 @@ class OceanTile(Tile):
 
     # draws this tile on the main canvas
     def render(self):
-        pygame.draw.rect(win, (0, 66, 146),
-            (Tile.xPixels(self), Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
+        pygame.draw.rect(win, (0, 66, 146), (Tile.xPixels(self),
+            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
 
-class LandTile(Tile):
-    'Land tile to mark land'
+class PlainTile(Tile):
+    'Land tile to mark plains'
     
     def __init__(self, x, y, height):
         Tile.__init__(self, x, y, height)
 
     # draws this tile on the main canvas    
     def render(self):
-        pygame.draw.rect(win, (0, 196, 116),
-            (Tile.xPixels(self), Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
-    
+        pygame.draw.rect(win, (116, 196, 116), (Tile.xPixels(self),
+            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
 
+class BeachTile(Tile):
+    'Land tile to mark beach'
+    
+    def __init__(self, x, y, height):
+        Tile.__init__(self, x, y, height)
+
+    # draws this tile on the main canvas    
+    def render(self):
+        pygame.draw.rect(win, (255, 238, 173), (Tile.xPixels(self),
+            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
+
+class JungleTile(Tile):
+    'Land tile to mark jungle'
+    
+    def __init__(self, x, y, height):
+        Tile.__init__(self, x, y, height)
+
+    # draws this tile on the main canvas    
+    def render(self):
+        pygame.draw.rect(win, (45, 116, 45), (Tile.xPixels(self),
+            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
+
+class MountainTile(Tile):
+    'Land tile to mark jungle'
+    
+    def __init__(self, x, y, height):
+        Tile.__init__(self, x, y, height)
+
+    # draws this tile on the main canvas    
+    def render(self):
+        pygame.draw.rect(win, (116, 116, 116), (Tile.xPixels(self),
+            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
+
+class SnowTile(Tile):
+    'Land tile to mark jungle'
+    
+    def __init__(self, x, y, height):
+        Tile.__init__(self, x, y, height)
+
+    # draws this tile on the main canvas    
+    def render(self):
+        pygame.draw.rect(win, (255, 255, 255), (Tile.xPixels(self),
+            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
 
 # ------------------------- Game LOOP ----------------------------
 
@@ -111,7 +180,29 @@ class LandTile(Tile):
 WIDTH = 800
 HEIGHT = 800
 FPS = 60
-TILE_SIZE = 10
+TILE_SIZE = 5
+
+# Constants for map generation
+SEED = 0
+MAP_SIZE = 800 / TILE_SIZE
+
+# Elevation Constants
+WATER_LEVEL = 100
+BEACH_LEVEL = 120
+PLAIN_LEVEL = 170
+JUNGLE_LEVEL = 210
+MOUNTAIN_LEVEL = 230
+SNOW_LEVEL = 240
+MAX_SCALE = 255
+MIN_SCALE = 0
+FREQUENCY = 0.05
+POW_CONST = 1.0
+
+# Island generation constants
+MANHATTAN_DIST = int((2.5 * MAP_SIZE) / 4)
+LAND_CONST = 0.15
+WATER_CONST = 0.75
+DROP_CONST = 3.0
 
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Game")
@@ -120,6 +211,7 @@ pygame.display.set_caption("Game")
 # This is the loop that runs the game
 # Will loop at FPS amount of times in a second
 run = True
+noise = OpenSimplex(SEED)
 world = generateMap()
 while run:
     pygame.time.delay(int(1000/FPS))
