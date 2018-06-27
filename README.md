@@ -6,3 +6,7 @@ Objectives and planned features: <br />
 - Weather Patterns <br />
 - Interactive Game Objects <br />
 - ???
+
+# Packages Used <br />
+- Pygame (https://pypi.org/project/Pygame/) <br />
+- Opensimplex (https://pypi.org/project/opensimplex/) <br />
