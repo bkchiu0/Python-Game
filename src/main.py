@@ -5,7 +5,46 @@ pygame.init();
 
 # --------------- Event Handling Functions ------------
 
+# handles all the keys events
+def keyHandler(keys):
+    if keys[pygame.K_w] :
+        player.velY = -10
+    elif keys[pygame.K_s] :
+        player.velY = 10
+    else :
+        player.velY = 0
+    if keys[pygame.K_a] :
+        player.velX = -10
+    elif keys[pygame.K_d] :
+        player.velX = 10
+    else :
+        player.velX = 0
 
+# --------------- Rendering Functions ---------------
+
+# Limits the view only to a certain section of the map
+#def renderTerrain() :
+#    screenWidth = int(WIDTH * 1.25 / TILE_SIZE)
+#    screenHeight = int(HEIGHT * 1.25 / TILE_SIZE)
+#    topLX = limit(int(player.x / TILE_SIZE) - int(screenWidth / 2))
+#    topLY = limit(int(player.y / TILE_SIZE) - int(screenHeight / 2))
+#    bottomRX = limit(int(player.x / TILE_SIZE) + int(screenWidth / 2))
+#    bottomRY = limit(int(player.y / TILE_SIZE) + int(screenHeight / 2))
+#    for y in range(topLY, bottomRY) :
+#        for x in range(topLX, bottomRX) :
+#            world[y][x].render(topLX, topLY)
+
+def renderTerrain() :
+    for row in world :
+        for tile in row :
+            tile.render(0, 0)
+
+def limit(n) :
+    if(n < 0) :
+        return 0
+    if(n > MAP_SIZE) :
+        return MAP_SIZE
+    return n
 
 
 # --------------- World Generation ------------------
@@ -74,7 +113,7 @@ class Entity(ABC):
 
     # Fields
     # int x, int y, int idVal
-    # float velX, float velY, float accX, float accY
+    # int velX, int velY, int accX, int accY
     def __init__(self, x, y, velX, velY, accX, accY, idVal):
         self.x = x
         self.y = y
@@ -83,6 +122,24 @@ class Entity(ABC):
         self.accX = accX
         self.accY = accY
         self.idVal = idVal
+
+    @abstractmethod
+    def render(self):
+        pass
+
+    def update(self):
+        self.x += self.velX
+        self.y += self.velY
+        self.velX += self.accX
+        self.velY += self.accY
+
+class Player(Entity):
+    'Represents the player in the game'
+    def __init__(self, x, y, velX, velY, accX, accY, idVal):
+        Entity.__init__(self, x, y, velX, velY, accX, accY, idVal)
+
+    def render(self):
+        pygame.draw.rect(win, (200, 200, 200), (self.x, self.y, 30, 30))
 
 # Tile is the grandfather class for all background tiles in the game
 class Tile(ABC):
@@ -96,16 +153,18 @@ class Tile(ABC):
         self.height = height
 
     # Returns an int that indicates the x position of the tile in pixels
-    def xPixels(self):
-        return self.x * TILE_SIZE
+    def xPixels(self, offX):
+        return (self.x * TILE_SIZE) - (player.x % TILE_SIZE) - (offX *
+        TILE_SIZE)
 
     # Returns an int that indicates the y position of the tile in pixels
-    def yPixels(self):
-        return self.y * TILE_SIZE
+    def yPixels(self, offY):
+        return (self.y * TILE_SIZE) - (player.y % TILE_SIZE) - (offY *
+        TILE_SIZE)
 
     # draws this tile on the main canvas
     @abstractmethod
-    def render(self):
+    def render(self, offX, offY):
         pass
 
 class OceanTile(Tile):
@@ -115,9 +174,9 @@ class OceanTile(Tile):
         Tile.__init__(self, x, y, height)
 
     # draws this tile on the main canvas
-    def render(self):
-        pygame.draw.rect(win, (0, 66, 146), (Tile.xPixels(self),
-            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
+    def render(self, offX, offY):
+        pygame.draw.rect(win, (0, 66, 146), (Tile.xPixels(self, offX),
+            Tile.yPixels(self, offY), TILE_SIZE, TILE_SIZE))
 
 class PlainTile(Tile):
     'Land tile to mark plains'
@@ -126,9 +185,9 @@ class PlainTile(Tile):
         Tile.__init__(self, x, y, height)
 
     # draws this tile on the main canvas    
-    def render(self):
-        pygame.draw.rect(win, (116, 196, 116), (Tile.xPixels(self),
-            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
+    def render(self, offX, offY):
+        pygame.draw.rect(win, (116, 196, 116), (Tile.xPixels(self, offX),
+            Tile.yPixels(self, offY), TILE_SIZE, TILE_SIZE))
 
 class BeachTile(Tile):
     'Land tile to mark beach'
@@ -137,9 +196,9 @@ class BeachTile(Tile):
         Tile.__init__(self, x, y, height)
 
     # draws this tile on the main canvas    
-    def render(self):
-        pygame.draw.rect(win, (255, 238, 173), (Tile.xPixels(self),
-            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
+    def render(self, offX, offY):
+        pygame.draw.rect(win, (255, 238, 173), (Tile.xPixels(self, offX),
+            Tile.yPixels(self, offY), TILE_SIZE, TILE_SIZE))
 
 class JungleTile(Tile):
     'Land tile to mark jungle'
@@ -148,9 +207,9 @@ class JungleTile(Tile):
         Tile.__init__(self, x, y, height)
 
     # draws this tile on the main canvas    
-    def render(self):
-        pygame.draw.rect(win, (45, 116, 45), (Tile.xPixels(self),
-            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
+    def render(self, offX, offY):
+        pygame.draw.rect(win, (45, 116, 45), (Tile.xPixels(self, offX),
+            Tile.yPixels(self, offY), TILE_SIZE, TILE_SIZE))
 
 class MountainTile(Tile):
     'Land tile to mark jungle'
@@ -159,9 +218,9 @@ class MountainTile(Tile):
         Tile.__init__(self, x, y, height)
 
     # draws this tile on the main canvas    
-    def render(self):
-        pygame.draw.rect(win, (116, 116, 116), (Tile.xPixels(self),
-            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
+    def render(self, offX, offY):
+        pygame.draw.rect(win, (116, 116, 116), (Tile.xPixels(self, offX),
+            Tile.yPixels(self, offY), TILE_SIZE, TILE_SIZE))
 
 class SnowTile(Tile):
     'Land tile to mark jungle'
@@ -170,20 +229,20 @@ class SnowTile(Tile):
         Tile.__init__(self, x, y, height)
 
     # draws this tile on the main canvas    
-    def render(self):
-        pygame.draw.rect(win, (255, 255, 255), (Tile.xPixels(self),
-            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
+    def render(self, offX, offY):
+        pygame.draw.rect(win, (255, 255, 255), (Tile.xPixels(self, offX),
+            Tile.yPixels(self, offY), TILE_SIZE, TILE_SIZE))
 
 # ------------------------- Game LOOP ----------------------------
 
 # Constants for the window display
 WIDTH = 800
 HEIGHT = 800
-FPS = 60
+FPS = 200
 TILE_SIZE = 5
 
 # Constants for map generation
-SEED = 0
+SEED = 574421234
 MAP_SIZE = 800 / TILE_SIZE
 
 # Elevation Constants
@@ -213,18 +272,18 @@ pygame.display.set_caption("Game")
 run = True
 noise = OpenSimplex(SEED)
 world = generateMap()
+player = Player(MAP_SIZE * TILE_SIZE / 2, MAP_SIZE * TILE_SIZE / 2, 0, 0, 0,
+0, 0)
 while run:
     pygame.time.delay(int(1000/FPS))
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-    
-    for row in world :
-        for tile in row :
-            tile.render()
-    
-    pygame.display.update()
+    keyHandler(pygame.key.get_pressed())
+    win.fill((0, 0, 0))
+    renderTerrain()
+    pygame.display.flip()
     
 # End the game
 pygame.quit()    
