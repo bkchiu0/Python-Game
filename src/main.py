@@ -22,22 +22,10 @@ def keyHandler(keys):
 
 # --------------- Rendering Functions ---------------
 
-# Limits the view only to a certain section of the map
-#def renderTerrain() :
-#    screenWidth = int(WIDTH * 1.25 / TILE_SIZE)
-#    screenHeight = int(HEIGHT * 1.25 / TILE_SIZE)
-#    topLX = limit(int(player.x / TILE_SIZE) - int(screenWidth / 2))
-#    topLY = limit(int(player.y / TILE_SIZE) - int(screenHeight / 2))
-#    bottomRX = limit(int(player.x / TILE_SIZE) + int(screenWidth / 2))
-#    bottomRY = limit(int(player.y / TILE_SIZE) + int(screenHeight / 2))
-#    for y in range(topLY, bottomRY) :
-#        for x in range(topLX, bottomRX) :
-#            world[y][x].render(topLX, topLY)
-
 def renderTerrain() :
     for row in world :
         for tile in row :
-            tile.render(0, 0)
+            tile.render()
 
 def limit(n) :
     if(n < 0) :
@@ -153,18 +141,16 @@ class Tile(ABC):
         self.height = height
 
     # Returns an int that indicates the x position of the tile in pixels
-    def xPixels(self, offX):
-        return (self.x * TILE_SIZE) - (player.x % TILE_SIZE) - (offX *
-        TILE_SIZE)
+    def xPixels(self):
+        return (self.x * TILE_SIZE)
 
     # Returns an int that indicates the y position of the tile in pixels
-    def yPixels(self, offY):
-        return (self.y * TILE_SIZE) - (player.y % TILE_SIZE) - (offY *
-        TILE_SIZE)
+    def yPixels(self):
+        return (self.y * TILE_SIZE)
 
     # draws this tile on the main canvas
     @abstractmethod
-    def render(self, offX, offY):
+    def render(self):
         pass
 
 class OceanTile(Tile):
@@ -174,9 +160,9 @@ class OceanTile(Tile):
         Tile.__init__(self, x, y, height)
 
     # draws this tile on the main canvas
-    def render(self, offX, offY):
-        pygame.draw.rect(win, (0, 66, 146), (Tile.xPixels(self, offX),
-            Tile.yPixels(self, offY), TILE_SIZE, TILE_SIZE))
+    def render(self):
+        pygame.draw.rect(win, (0, 66, 146), (Tile.xPixels(self),
+            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
 
 class PlainTile(Tile):
     'Land tile to mark plains'
@@ -185,9 +171,9 @@ class PlainTile(Tile):
         Tile.__init__(self, x, y, height)
 
     # draws this tile on the main canvas    
-    def render(self, offX, offY):
-        pygame.draw.rect(win, (116, 196, 116), (Tile.xPixels(self, offX),
-            Tile.yPixels(self, offY), TILE_SIZE, TILE_SIZE))
+    def render(self):
+        pygame.draw.rect(win, (116, 196, 116), (Tile.xPixels(self),
+            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
 
 class BeachTile(Tile):
     'Land tile to mark beach'
@@ -196,9 +182,9 @@ class BeachTile(Tile):
         Tile.__init__(self, x, y, height)
 
     # draws this tile on the main canvas    
-    def render(self, offX, offY):
-        pygame.draw.rect(win, (255, 238, 173), (Tile.xPixels(self, offX),
-            Tile.yPixels(self, offY), TILE_SIZE, TILE_SIZE))
+    def render(self):
+        pygame.draw.rect(win, (255, 238, 173), (Tile.xPixels(self),
+            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
 
 class JungleTile(Tile):
     'Land tile to mark jungle'
@@ -207,9 +193,9 @@ class JungleTile(Tile):
         Tile.__init__(self, x, y, height)
 
     # draws this tile on the main canvas    
-    def render(self, offX, offY):
-        pygame.draw.rect(win, (45, 116, 45), (Tile.xPixels(self, offX),
-            Tile.yPixels(self, offY), TILE_SIZE, TILE_SIZE))
+    def render(self):
+        pygame.draw.rect(win, (45, 116, 45), (Tile.xPixels(self),
+            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
 
 class MountainTile(Tile):
     'Land tile to mark jungle'
@@ -218,9 +204,9 @@ class MountainTile(Tile):
         Tile.__init__(self, x, y, height)
 
     # draws this tile on the main canvas    
-    def render(self, offX, offY):
-        pygame.draw.rect(win, (116, 116, 116), (Tile.xPixels(self, offX),
-            Tile.yPixels(self, offY), TILE_SIZE, TILE_SIZE))
+    def render(self):
+        pygame.draw.rect(win, (116, 116, 116), (Tile.xPixels(self),
+            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
 
 class SnowTile(Tile):
     'Land tile to mark jungle'
@@ -229,9 +215,9 @@ class SnowTile(Tile):
         Tile.__init__(self, x, y, height)
 
     # draws this tile on the main canvas    
-    def render(self, offX, offY):
-        pygame.draw.rect(win, (255, 255, 255), (Tile.xPixels(self, offX),
-            Tile.yPixels(self, offY), TILE_SIZE, TILE_SIZE))
+    def render(self):
+        pygame.draw.rect(win, (255, 255, 255), (Tile.xPixels(self),
+            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
 
 # ------------------------- Game LOOP ----------------------------
 
