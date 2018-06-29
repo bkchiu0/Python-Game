@@ -6,30 +6,7 @@ from entities import *
 import pygame
 import random
 
-# --------------- Event Handling Functions ------------
-
-# handles all the keys events
-# outdated : needs update
-def keyHandler(keys):
-    if keys[pygame.K_w]:
-        player.velY = -10
-    elif keys[pygame.K_s]:
-        player.velY = 10
-    else:
-        player.velY = 0
-    if keys[pygame.K_a]:
-        player.velX = -10
-    elif keys[pygame.K_d]:
-        player.velX = 10
-    else:
-        player.velX = 0
-
 # --------------- Static Rendering Functions ---------------
-
-def renderTerrain(surface, world) :
-    for row in world :
-        for tile in row :
-            tile.render(surface)
 
 def renderGrid(surface) :
     for x in range(0, WIDTH, TILE_SIZE) :
@@ -89,19 +66,19 @@ def generateTileMap(heightMap) :
         tileRow = []
         for x in range(len(heightMap[y])) :
             if(heightMap[y][x] <= DEEP_LEVEL) :
-                tileRow.append(DeepWaterTile(x, y, heightMap[y][x]))
+                tileRow.append(DeepWaterTile((x, y), heightMap[y][x]))
             elif(heightMap[y][x] <= WATER_LEVEL) :
-                tileRow.append(WaterTile(x, y, heightMap[y][x]))
+                tileRow.append(WaterTile((x, y), heightMap[y][x]))
             elif(heightMap[y][x] <= BEACH_LEVEL) :
-                tileRow.append(BeachTile(x, y, heightMap[y][x]))
+                tileRow.append(BeachTile((x, y), heightMap[y][x]))
             elif(heightMap[y][x] <= PLAIN_LEVEL) :
-                tileRow.append(PlainTile(x, y, heightMap[y][x]))
+                tileRow.append(PlainTile((x, y), heightMap[y][x]))
             elif(heightMap[y][x] <= JUNGLE_LEVEL) :
-                tileRow.append(JungleTile(x, y, heightMap[y][x]))
+                tileRow.append(JungleTile((x, y), heightMap[y][x]))
             elif(heightMap[y][x] <= MOUNTAIN_LEVEL) :
-                tileRow.append(MountainTile(x, y, heightMap[y][x]))
+                tileRow.append(MountainTile((x, y), heightMap[y][x]))
             else :
-                tileRow.append(SnowTile(x, y, heightMap[y][x]))
+                tileRow.append(SnowTile((x, y), heightMap[y][x]))
         tileMap.append(tileRow)
     return tileMap
 
@@ -115,15 +92,22 @@ class Game:
         
         self.win = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption(TITLE)
-        
         self.clock = pygame.time.Clock()
         self.noise = OpenSimplex(SEED)
-        self.world = generateMap(self.noise)
         self.running = True
+        self.world = generateMap(self.noise)
+
+    # Used of loading any outside information
+    def load_data(self):
+        pass
 
     # Starts a new game
     def new(self):
-        self.all_entities = pygame.sprite.Group()
+        self.all_entities = pygame.sprite.LayeredDirty()
+        self.all_entities.add(Bot((MAP_SIZE / 2, MAP_SIZE / 2), 0))
+        self.all_tiles = pygame.sprite.LayeredDirty()
+        for row in self.world:
+            self.all_tiles.add(row)
         self.run()
 
     # Game loop
@@ -137,21 +121,23 @@ class Game:
 
     # Game loop update
     def update(self):
-        pass
+        self.all_entities.update()
+        self.all_tiles.update()
 
     # Game loop event handler
     def events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.playing = False
-        #keyHandler(pygame.key.get_pressed())
+                self.running = False
+        keys = pygame.key.get_pressed()
 
     # Game Loop - draw
     def draw(self):
-        self.win.fill((0, 0, 0))
-        renderTerrain(self.win, self.world)
-        self.all_entities.draw(self.win)
-        pygame.display.flip()
+        self.win.fill((255, 255, 255))
+        self.all_tiles.draw(self.win)
+        rects = self.all_entities.draw(self.win)
+        pygame.display.update(rects)
 
     # Shows the start screen
     def show_start(self):
@@ -171,4 +157,4 @@ while g.running:
     g.show_go()
     
 # End the game
-pygame.quit()    
+pygame.quit()

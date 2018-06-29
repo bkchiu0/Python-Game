@@ -5,36 +5,28 @@ import pygame
 import random
 pygame.init()
 
-# Entity is the grandfather class of all things in the game
-class Entity(ABC):
-    'Common base class for all game entities'
-
+class Bot(pygame.sprite.DirtySprite):
+    'Represents the bots in the game'
     # Fields
     # int x, int y, int idVal
     # int velX, int velY, int accX, int accY
-    def __init__(self, x, y, velX, velY, accX, accY, idVal):
-        self.x = x
-        self.y = y
-        self.velX = velX
-        self.velY = velY
-        self.accX = accX
-        self.accY = accY
-        self.idVal = idVal
+    def __init__(self, coords, team):
+        pygame.sprite.DirtySprite.__init__(self)
+        self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
+        self.image.fill((0, 0, 0))
+        self.rect = self.image.get_rect()
+        self.x = coords[0]
+        self.y = coords[1]
+        self.team = team
+        self.dirty = 2
 
-    @abstractmethod
-    def render(self):
-        pass
-
+    # Moves the bot and updates the bot's coordinates
     def update(self):
-        self.x += self.velX
-        self.y += self.velY
-        self.velX += self.accX
-        self.velY += self.accY
+        self.move()
+        self.rect.topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE)
 
-class Player(Entity):
-    'Represents the player in the game'
-    def __init__(self, x, y, velX, velY, accX, accY, idVal):
-        Entity.__init__(self, x, y, velX, velY, accX, accY, idVal)
+    # Moves the bot in a direction
+    def move(self):
+        self.x += 1
 
-    def render(self, surface):
-        pygame.draw.rect(surface, (200, 200, 200), (self.x, self.y, 30, 30))
+
