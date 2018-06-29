@@ -1,0 +1,29 @@
+# Constants for the window display
+WIDTH = 800
+HEIGHT = 800
+FPS = 200
+TILE_SIZE = 5
+TITLE = "Procedural Map Generator"
+
+# Constants for map generation
+SEED = 574421234
+MAP_SIZE = 800 / TILE_SIZE
+
+# Elevation Constants
+DEEP_LEVEL = 25
+WATER_LEVEL = 100
+BEACH_LEVEL = 120
+PLAIN_LEVEL = 170
+JUNGLE_LEVEL = 210
+MOUNTAIN_LEVEL = 230
+SNOW_LEVEL = 240
+MAX_SCALE = 255
+MIN_SCALE = 0
+FREQUENCY = 0.05
+POW_CONST = 1.0
+
+# Island generation constants
+MANHATTAN_DIST = int((2.5 * MAP_SIZE) / 4)
+LAND_CONST = 0.15
+WATER_CONST = 0.75
+DROP_CONST = 3.0

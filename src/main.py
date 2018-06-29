@@ -1,31 +1,41 @@
 from abc import ABC, abstractmethod
 from opensimplex import OpenSimplex
+from settings import *
+from tiles import *
+from entities import *
 import pygame
-pygame.init();
+import random
 
 # --------------- Event Handling Functions ------------
 
 # handles all the keys events
+# outdated : needs update
 def keyHandler(keys):
-    if keys[pygame.K_w] :
+    if keys[pygame.K_w]:
         player.velY = -10
-    elif keys[pygame.K_s] :
+    elif keys[pygame.K_s]:
         player.velY = 10
-    else :
+    else:
         player.velY = 0
-    if keys[pygame.K_a] :
+    if keys[pygame.K_a]:
         player.velX = -10
-    elif keys[pygame.K_d] :
+    elif keys[pygame.K_d]:
         player.velX = 10
-    else :
+    else:
         player.velX = 0
 
-# --------------- Rendering Functions ---------------
+# --------------- Static Rendering Functions ---------------
 
-def renderTerrain() :
+def renderTerrain(surface, world) :
     for row in world :
         for tile in row :
-            tile.render()
+            tile.render(surface)
+
+def renderGrid(surface) :
+    for x in range(0, WIDTH, TILE_SIZE) :
+        pygame.draw.line(surface, (0, 0, 0), (x, 0), (x, HEIGHT))
+    for y in range(0, HEIGHT, TILE_SIZE) :
+        pygame.draw.line(surface, (0, 0, 0), (0, y), (WIDTH, y))    
 
 def limit(n) :
     if(n < 0) :
@@ -35,27 +45,27 @@ def limit(n) :
     return n
 
 
-# --------------- World Generation ------------------
+# --------------- Static World Generation ------------------
 
 # Generates the map which is a 2d list of tiles
-def generateMap() :
-    heightMap = generateHeightMap()
+def generateMap(noise) :
+    heightMap = generateHeightMap(noise)
     return generateTileMap(heightMap)
 
 # Generates a 2d list of floats all 0.0
 # to represent the map in terms of its height
-def generateHeightMap() :
+def generateHeightMap(noise) :
     heightMap = []
     for y in range(0, int(MAP_SIZE)) :
         row = []
         for x in range(0, int(MAP_SIZE)):
-            row.append(scale(genHeight(x, y)))
+            row.append(scale(genHeight(x, y, noise)))
         heightMap.append(row)
     return heightMap
 
 # Generates a float using noise function
 # range is from MIN_SCALE to MAX_SCALE inclusive
-def genHeight(x, y):
+def genHeight(x, y, noise):
     n1 = 0.75 * (noise.noise2d(FREQUENCY * x, FREQUENCY * y) + 1) / 2
     n2 = 0.20 * (noise.noise2d(2 * FREQUENCY * x, 2 * FREQUENCY * y) + 1) / 2
     n3 = 0.05 * (noise.noise2d(4 * FREQUENCY * x, 4 * FREQUENCY * y) + 1) / 2
@@ -78,8 +88,10 @@ def generateTileMap(heightMap) :
     for y in range(len(heightMap)) :
         tileRow = []
         for x in range(len(heightMap[y])) :
-            if(heightMap[y][x] <= WATER_LEVEL) :
-                tileRow.append(OceanTile(x, y, heightMap[y][x]))
+            if(heightMap[y][x] <= DEEP_LEVEL) :
+                tileRow.append(DeepWaterTile(x, y, heightMap[y][x]))
+            elif(heightMap[y][x] <= WATER_LEVEL) :
+                tileRow.append(WaterTile(x, y, heightMap[y][x]))
             elif(heightMap[y][x] <= BEACH_LEVEL) :
                 tileRow.append(BeachTile(x, y, heightMap[y][x]))
             elif(heightMap[y][x] <= PLAIN_LEVEL) :
@@ -93,183 +105,70 @@ def generateTileMap(heightMap) :
         tileMap.append(tileRow)
     return tileMap
 
-# --------------- Class definitions -----------------
+# ------------------------- Game Class ----------------------------
 
-# Entity is the grandfather class of all things in the game
-class Entity(ABC):
-    'Common base class for all game entities'
+class Game:
+    # Initialize game object fields
+    def __init__(self):
+        pygame.init()
+        pygame.mixer.init()
+        
+        self.win = pygame.display.set_mode((WIDTH, HEIGHT))
+        pygame.display.set_caption(TITLE)
+        
+        self.clock = pygame.time.Clock()
+        self.noise = OpenSimplex(SEED)
+        self.world = generateMap(self.noise)
+        self.running = True
 
-    # Fields
-    # int x, int y, int idVal
-    # int velX, int velY, int accX, int accY
-    def __init__(self, x, y, velX, velY, accX, accY, idVal):
-        self.x = x
-        self.y = y
-        self.velX = velX
-        self.velY = velY
-        self.accX = accX
-        self.accY = accY
-        self.idVal = idVal
+    # Starts a new game
+    def new(self):
+        self.all_entities = pygame.sprite.Group()
+        self.run()
 
-    @abstractmethod
-    def render(self):
-        pass
+    # Game loop
+    def run(self):
+        self.playing = True
+        self.clock.tick(FPS)
+        while self.playing:
+            self.events()
+            self.update()
+            self.draw()
 
+    # Game loop update
     def update(self):
-        self.x += self.velX
-        self.y += self.velY
-        self.velX += self.accX
-        self.velY += self.accY
-
-class Player(Entity):
-    'Represents the player in the game'
-    def __init__(self, x, y, velX, velY, accX, accY, idVal):
-        Entity.__init__(self, x, y, velX, velY, accX, accY, idVal)
-
-    def render(self):
-        pygame.draw.rect(win, (200, 200, 200), (self.x, self.y, 30, 30))
-
-# Tile is the grandfather class for all background tiles in the game
-class Tile(ABC):
-    'Generic tile for building the world'
-
-    #Fields
-    # int x, int y, float height
-    def __init__(self, x, y, height):
-        self.x = x
-        self.y = y
-        self.height = height
-
-    # Returns an int that indicates the x position of the tile in pixels
-    def xPixels(self):
-        return (self.x * TILE_SIZE)
-
-    # Returns an int that indicates the y position of the tile in pixels
-    def yPixels(self):
-        return (self.y * TILE_SIZE)
-
-    # draws this tile on the main canvas
-    @abstractmethod
-    def render(self):
         pass
 
-class OceanTile(Tile):
-    'Ocean tile to mark water'
+    # Game loop event handler
+    def events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.playing = False
+        #keyHandler(pygame.key.get_pressed())
 
-    def __init__(self, x, y, height):
-        Tile.__init__(self, x, y, height)
+    # Game Loop - draw
+    def draw(self):
+        self.win.fill((0, 0, 0))
+        renderTerrain(self.win, self.world)
+        self.all_entities.draw(self.win)
+        pygame.display.flip()
 
-    # draws this tile on the main canvas
-    def render(self):
-        pygame.draw.rect(win, (0, 66, 146), (Tile.xPixels(self),
-            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
+    # Shows the start screen
+    def show_start(self):
+        pass
 
-class PlainTile(Tile):
-    'Land tile to mark plains'
-    
-    def __init__(self, x, y, height):
-        Tile.__init__(self, x, y, height)
+    # Shows the end screen
+    def show_go(self):
+        pass
 
-    # draws this tile on the main canvas    
-    def render(self):
-        pygame.draw.rect(win, (116, 196, 116), (Tile.xPixels(self),
-            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
-
-class BeachTile(Tile):
-    'Land tile to mark beach'
-    
-    def __init__(self, x, y, height):
-        Tile.__init__(self, x, y, height)
-
-    # draws this tile on the main canvas    
-    def render(self):
-        pygame.draw.rect(win, (255, 238, 173), (Tile.xPixels(self),
-            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
-
-class JungleTile(Tile):
-    'Land tile to mark jungle'
-    
-    def __init__(self, x, y, height):
-        Tile.__init__(self, x, y, height)
-
-    # draws this tile on the main canvas    
-    def render(self):
-        pygame.draw.rect(win, (45, 116, 45), (Tile.xPixels(self),
-            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
-
-class MountainTile(Tile):
-    'Land tile to mark jungle'
-    
-    def __init__(self, x, y, height):
-        Tile.__init__(self, x, y, height)
-
-    # draws this tile on the main canvas    
-    def render(self):
-        pygame.draw.rect(win, (116, 116, 116), (Tile.xPixels(self),
-            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
-
-class SnowTile(Tile):
-    'Land tile to mark jungle'
-    
-    def __init__(self, x, y, height):
-        Tile.__init__(self, x, y, height)
-
-    # draws this tile on the main canvas    
-    def render(self):
-        pygame.draw.rect(win, (255, 255, 255), (Tile.xPixels(self),
-            Tile.yPixels(self), TILE_SIZE, TILE_SIZE))
-
-# ------------------------- Game LOOP ----------------------------
-
-# Constants for the window display
-WIDTH = 800
-HEIGHT = 800
-FPS = 200
-TILE_SIZE = 5
-
-# Constants for map generation
-SEED = 574421234
-MAP_SIZE = 800 / TILE_SIZE
-
-# Elevation Constants
-WATER_LEVEL = 100
-BEACH_LEVEL = 120
-PLAIN_LEVEL = 170
-JUNGLE_LEVEL = 210
-MOUNTAIN_LEVEL = 230
-SNOW_LEVEL = 240
-MAX_SCALE = 255
-MIN_SCALE = 0
-FREQUENCY = 0.05
-POW_CONST = 1.0
-
-# Island generation constants
-MANHATTAN_DIST = int((2.5 * MAP_SIZE) / 4)
-LAND_CONST = 0.15
-WATER_CONST = 0.75
-DROP_CONST = 3.0
-
-win = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Game")
-
-# GAME LOOP
+# --------------------- GAME LOOP ---------------------
 # This is the loop that runs the game
 # Will loop at FPS amount of times in a second
-run = True
-noise = OpenSimplex(SEED)
-world = generateMap()
-player = Player(MAP_SIZE * TILE_SIZE / 2, MAP_SIZE * TILE_SIZE / 2, 0, 0, 0,
-0, 0)
-while run:
-    pygame.time.delay(int(1000/FPS))
-    
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-    keyHandler(pygame.key.get_pressed())
-    win.fill((0, 0, 0))
-    renderTerrain()
-    pygame.display.flip()
+
+g = Game()
+while g.running:
+    g.new()
+    g.show_go()
     
 # End the game
 pygame.quit()    
