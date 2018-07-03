@@ -25,11 +25,25 @@ def limit(n) :
 # --------------- Static World Generation ------------------
 
 # Generates the map which is a 2d list of tiles
-def generateMap(noise) :
-    heightMap = generateHeightMap(noise)
-    return generateTileMap(heightMap)
+def generateMap(heightNoise, resourceNoise) :
+    heightMap = generateHeightMap(heightNoise)
+    resourceMap = generateResourceMap(resourceNoise)
+    tileMap = generateTileMap(heightMap, resourceMap)
+    setNeighbors(tileMap)
+    return tileMap
 
-# Generates a 2d list of floats all 0.0
+# Generates a 2d list of floats
+# to represents the map in terms of resource levels
+def generateResourceMap(noise) :
+    resourceMap = []
+    for y in range(0, int(MAP_SIZE)) :
+        row = []
+        for x in range(0, int(MAP_SIZE)):
+            row.append(scale(genResources(x, y, noise)))
+        resourceMap.append(row)
+    return resourceMap
+
+# Generates a 2d list of floats
 # to represent the map in terms of its height
 def generateHeightMap(noise) :
     heightMap = []
@@ -40,8 +54,17 @@ def generateHeightMap(noise) :
         heightMap.append(row)
     return heightMap
 
+# Generates a float using a noise function
+# range is [0,1)
+def genResources(x, y, noise):
+    n1 = 0.65 * (noise.noise2d(FREQUENCY * x, FREQUENCY * y) + 1) / 2
+    n2 = 0.35 * (noise.noise2d(1.5 * FREQUENCY * x, 1.5 * FREQUENCY * y) + 1
+    ) / 2
+    e = n1 + n2
+    return pow(e, POW_CONST)
+
 # Generates a float using noise function
-# range is from MIN_SCALE to MAX_SCALE inclusive
+# range is [0,1)
 def genHeight(x, y, noise):
     n1 = 0.75 * (noise.noise2d(FREQUENCY * x, FREQUENCY * y) + 1) / 2
     n2 = 0.20 * (noise.noise2d(2 * FREQUENCY * x, 2 * FREQUENCY * y) + 1) / 2
@@ -60,31 +83,65 @@ def scale(val):
 
 # Generates a 2d list of tile objects based on
 # the height map given as a parameter
-def generateTileMap(heightMap) :
+def generateTileMap(heightMap, resourceMap):
     tileMap = []
-    for y in range(len(heightMap)) :
+    for y in range(len(heightMap)):
         tileRow = []
-        for x in range(len(heightMap[y])) :
-            if(heightMap[y][x] <= DEEP_LEVEL) :
-                tileRow.append(DeepWaterTile((x, y), heightMap[y][x]))
-            elif(heightMap[y][x] <= WATER_LEVEL) :
-                tileRow.append(WaterTile((x, y), heightMap[y][x]))
-            elif(heightMap[y][x] <= BEACH_LEVEL) :
-                tileRow.append(BeachTile((x, y), heightMap[y][x]))
-            elif(heightMap[y][x] <= PLAIN_LEVEL) :
-                tileRow.append(PlainTile((x, y), heightMap[y][x]))
-            elif(heightMap[y][x] <= JUNGLE_LEVEL) :
-                tileRow.append(JungleTile((x, y), heightMap[y][x]))
-            elif(heightMap[y][x] <= MOUNTAIN_LEVEL) :
-                tileRow.append(MountainTile((x, y), heightMap[y][x]))
+        for x in range(len(heightMap[y])):
+            if(heightMap[y][x] <= DEEP_LEVEL):
+                tileRow.append(DeepWaterTile((x, y), heightMap[y][x],
+                (resourceMap[y][x], 255, 0, 0)))
+            elif(heightMap[y][x] <= WATER_LEVEL):
+                tileRow.append(WaterTile((x, y), heightMap[y][x],
+                (resourceMap[y][x], 255, 0, 0)))
+            elif(heightMap[y][x] <= BEACH_LEVEL):
+                tileRow.append(BeachTile((x, y), heightMap[y][x],
+                (int(resourceMap[y][x] * 0.25), resourceMap[y][x], 0, 0)))
+            elif(heightMap[y][x] <= PLAIN_LEVEL):
+                tileRow.append(PlainTile((x, y), heightMap[y][x],
+                (resourceMap[y][x], int(resourceMap[y][x] * 0.10),
+                int(resourceMap[y][x] * 0.15), 0)))
+            elif(heightMap[y][x] <= JUNGLE_LEVEL):
+                tileRow.append(JungleTile((x, y), heightMap[y][x],
+                (int(resourceMap[y][x] * 0.15), int(resourceMap[y][x] * 0.10),
+                resourceMap[y][x], 0)))
+            elif(heightMap[y][x] <= MOUNTAIN_LEVEL):
+                tileRow.append(MountainTile((x, y), heightMap[y][x],
+                (0, 0, int(resourceMap[y][x] * 0.25),
+                resourceMap[y][x])))
             else :
-                tileRow.append(SnowTile((x, y), heightMap[y][x]))
+                tileRow.append(SnowTile((x, y), heightMap[y][x],
+                (0, resourceMap[y][x], 0, 0)))
         tileMap.append(tileRow)
     return tileMap
 
+# Sets the neighbors of the each tile
+def setNeighbors(cellMap):
+    for y in range(len(cellMap)):
+        for x in range(len(cellMap[y])):
+            if(y == 0):
+                cellMap[y][x].setTop(cellMap[y][x])
+                cellMap[y][x].setBottom(cellMap[y + 1][x])
+            elif(y == len(cellMap) - 1):
+                cellMap[y][x].setTop(cellMap[y - 1][x])
+                cellMap[y][x].setBottom(cellMap[y][x])
+            else:
+                cellMap[y][x].setTop(cellMap[y - 1][x])
+                cellMap[y][x].setBottom(cellMap[y + 1][x])
+            if(x == 0):
+                cellMap[y][x].setLeft(cellMap[y][x])
+                cellMap[y][x].setRight(cellMap[y][x + 1])
+            elif(x == len(cellMap[y]) - 1):
+                cellMap[y][x].setLeft(cellMap[y][x - 1])
+                cellMap[y][x].setRight(cellMap[y][x])
+            else:
+                cellMap[y][x].setLeft(cellMap[y][x - 1])
+                cellMap[y][x].setRight(cellMap[y][x + 1])
+                
+
 # ------------------------- Game Class ----------------------------
 
-class Game:
+class Game():
     # Initialize game object fields
     def __init__(self):
         pygame.init()
@@ -93,9 +150,10 @@ class Game:
         self.win = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
-        self.noise = OpenSimplex(SEED)
+        self.enoise = OpenSimplex(ELEVATION_SEED)
+        self.rnoise = OpenSimplex(RESOURCE_SEED)
         self.running = True
-        self.world = generateMap(self.noise)
+        self.world = generateMap(self.enoise, self.rnoise)
 
     # Used of loading any outside information
     def load_data(self):

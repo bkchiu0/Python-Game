@@ -1,3 +1,5 @@
+from math import *
+
 # Constants for the window display
 WIDTH = 800
 HEIGHT = WIDTH
@@ -6,7 +8,8 @@ TILE_SIZE = 5
 TITLE = "Procedural Map Generator"
 
 # Constants for map generation
-SEED = 574421234
+ELEVATION_SEED = 574421234
+RESOURCE_SEED = int(sqrt(fabs(ELEVATION_SEED)) + pow(WIDTH, e))
 MAP_SIZE = WIDTH / TILE_SIZE
 
 # Elevation Constants
@@ -32,3 +35,9 @@ DROP_CONST = 3.0
 PLAYER_ID = 0
 MAX_PLAYER_VEL = 5
 PLAYER_ACCEL = 2
+FOOD = 0
+WATER = 1
+WOOD = 2
+STONE = 3
+MIN_RESOURCE_LVL = 0
+MAX_RESOURCE_LVL = 255
