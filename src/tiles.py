@@ -71,7 +71,7 @@ class WaterTile(Tile):
         if(mapmode == WOOD_MAP):
             self.image.fill((0, 0, 0))
         if(mapmode == STONE_MAP):
-            self.image.fill((0, 0, 0))
+            self.image.fill((self.stone, self.stone, self.stone))
 
 class DeepWaterTile(Tile):
     'Deep Ocean tile to mark water'
@@ -97,7 +97,7 @@ class DeepWaterTile(Tile):
         if(mapmode == WOOD_MAP):
             self.image.fill((0, 0, 0))
         if(mapmode == STONE_MAP):
-            self.image.fill((0, 0, 0))
+            self.image.fill((self.stone, self.stone, self.stone))
 
 class PlainTile(Tile):
     'Land tile to mark plains'
@@ -123,7 +123,7 @@ class PlainTile(Tile):
         if(mapmode == WOOD_MAP):
             self.image.fill((self.wood, self.wood, 0))
         if(mapmode == STONE_MAP):
-            self.image.fill((0, 0, 0))
+            self.image.fill((self.stone, self.stone, self.stone))
 
 class BeachTile(Tile):
     'Land tile to mark beach'
@@ -149,7 +149,7 @@ class BeachTile(Tile):
         if(mapmode == WOOD_MAP):
             self.image.fill((0, 0, 0))
         if(mapmode == STONE_MAP):
-            self.image.fill((0, 0, 0))
+            self.image.fill((self.stone, self.stone, self.stone))
 
 class JungleTile(Tile):
     'Land tile to mark jungle'
@@ -175,7 +175,7 @@ class JungleTile(Tile):
         if(mapmode == WOOD_MAP):
             self.image.fill((self.wood, 0, 0))
         if(mapmode == STONE_MAP):
-            self.image.fill((0, 0, 0))
+            self.image.fill((self.stone, self.stone, self.stone))
 
 class MountainTile(Tile):
     'Land tile to mark jungle'
@@ -220,7 +220,7 @@ class SnowTile(Tile):
         if(mapmode == ELEVATION_MAP):
             self.image.fill((255, 255, 255))
         if(mapmode == RESOURCE_MAP):
-            self.image.fill((0, 0, self.water))
+            self.image.fill((self.stone, self.stone, self.water))
         if(mapmode == FOOD_MAP):
             self.image.fill((0, 0, 0))
         if(mapmode == WATER_MAP):
@@ -228,4 +228,4 @@ class SnowTile(Tile):
         if(mapmode == WOOD_MAP):
             self.image.fill((0, 0, 0))
         if(mapmode == STONE_MAP):
-            self.image.fill((0, 0, 0))
+            self.image.fill((self.stone, self.stone, self.stone))

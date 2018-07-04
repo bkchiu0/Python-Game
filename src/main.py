@@ -107,11 +107,10 @@ def generateTileMap(g, heightMap, resourceMap):
                 resourceMap[y][x], 0)))
             elif(heightMap[y][x] <= MOUNTAIN_LEVEL):
                 tileRow.append(MountainTile(g, (x, y), heightMap[y][x],
-                (0, 0, int(resourceMap[y][x] * 0.25),
-                resourceMap[y][x])))
+                (0, 0, int(resourceMap[y][x] * 0.25), 255)))
             else:
                 tileRow.append(SnowTile(g, (x, y), heightMap[y][x],
-                (0, resourceMap[y][x], 0, 0)))
+                (0, resourceMap[y][x], 0, resourceMap[y][x])))
         tileMap.append(tileRow)
     return tileMap
 
@@ -193,7 +192,6 @@ class Game():
         self.redraw = 1
         self.time = 0
         self.addPlayers()
-        print(self.all_entities)
 
     # adds all the players in the world
     # all players spawn on beach tiles
