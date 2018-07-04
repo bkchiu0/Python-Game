@@ -1,5 +1,5 @@
 # Python Game
-AI Bot battle royale
+AI Bot battle royale <br />
 This game is currently a work in progress <br />
 Objectives and planned features: <br />
 - Random Terrain Generation (90%)<br />
