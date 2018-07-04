@@ -5,7 +5,7 @@ Objectives and planned features: <br />
 - Random Terrain Generation (90%)<br />
 - Random Resource Generation (90%) <br />
 - Random Biome Generation (90%)<br />
-- Weather Patterns (0%)<br />
+- Weather Patterns and Day, Night cycle (0%)<br />
 - AI Players (50%)<br />
 - ???
 
