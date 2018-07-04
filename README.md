@@ -9,6 +9,14 @@ Objectives and planned features: <br />
 - AI Players (25%)<br />
 - ???
 
+# Keys
+0 - toggle elevation mapmode <br />
+1 - toggle resources mapmode <br />
+2 - toggle food mapmode <br />
+3 - toggle water mapmode <br />
+4 - toggle wood mapmode <br />
+5 - toggle stone mapmode <br />
+
 # Packages Used <br />
 - Pygame (https://pypi.org/project/Pygame/) <br />
 - Opensimplex (https://pypi.org/project/opensimplex/) <br />
