@@ -2,11 +2,11 @@
 AI Bot battle royale
 This game is currently a work in progress <br />
 Objectives and planned features: <br />
-- Random Terrain Generation (80%)<br />
-- Random Resource Generation (80%) <br />
-- Random Biome Generation (80%)<br />
+- Random Terrain Generation (90%)<br />
+- Random Resource Generation (90%) <br />
+- Random Biome Generation (90%)<br />
 - Weather Patterns (0%)<br />
-- AI Players (25%)<br />
+- AI Players (50%)<br />
 - ???
 
 # Keys
