@@ -90,27 +90,27 @@ def generateTileMap(g, heightMap, resourceMap):
         for x in range(len(heightMap[y])):
             if(heightMap[y][x] <= DEEP_LEVEL):
                 tileRow.append(DeepWaterTile(g, (x, y), heightMap[y][x],
-                (resourceMap[y][x], 255, 0, 0)))
+                [resourceMap[y][x], 255, 0, 0]))
             elif(heightMap[y][x] <= WATER_LEVEL):
                 tileRow.append(WaterTile(g, (x, y), heightMap[y][x],
-                (resourceMap[y][x], 255, 0, 0)))
+                [resourceMap[y][x], 255, 0, 0]))
             elif(heightMap[y][x] <= BEACH_LEVEL):
                 tileRow.append(BeachTile(g, (x, y), heightMap[y][x],
-                (int(resourceMap[y][x] * 0.25), resourceMap[y][x], 0, 0)))
+                [int(resourceMap[y][x] * 0.25), resourceMap[y][x], 0, 0]))
             elif(heightMap[y][x] <= PLAIN_LEVEL):
                 tileRow.append(PlainTile(g, (x, y), heightMap[y][x],
-                (resourceMap[y][x], int(resourceMap[y][x] * 0.10),
-                int(resourceMap[y][x] * 0.15), 0)))
+                [resourceMap[y][x], int(resourceMap[y][x] * 0.10),
+                int(resourceMap[y][x] * 0.15), 0]))
             elif(heightMap[y][x] <= JUNGLE_LEVEL):
                 tileRow.append(JungleTile(g, (x, y), heightMap[y][x],
-                (int(resourceMap[y][x] * 0.15), int(resourceMap[y][x] * 0.10),
-                resourceMap[y][x], 0)))
+                [int(resourceMap[y][x] * 0.15), int(resourceMap[y][x] * 0.10),
+                resourceMap[y][x], 0]))
             elif(heightMap[y][x] <= MOUNTAIN_LEVEL):
                 tileRow.append(MountainTile(g, (x, y), heightMap[y][x],
-                (0, 0, int(resourceMap[y][x] * 0.25), 255)))
+                [0, 0, int(resourceMap[y][x] * 0.25), 255]))
             else:
                 tileRow.append(SnowTile(g, (x, y), heightMap[y][x],
-                (0, resourceMap[y][x], 0, resourceMap[y][x])))
+                [0, resourceMap[y][x], 0, resourceMap[y][x]]))
         tileMap.append(tileRow)
     return tileMap
 

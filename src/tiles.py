@@ -18,10 +18,7 @@ class Tile(ABC, pygame.sprite.DirtySprite):
         self.y = coords[1]
         self.height = height
         self.dirty = 1
-        self.food = resources[FOOD]
-        self.water = resources[WATER]
-        self.wood = resources[WOOD]
-        self.stone = resources[STONE]
+        self.resources = resources
 
     # Updates the tile's properties
     @abstractmethod
@@ -57,22 +54,25 @@ class WaterTile(Tile):
         Tile.__init__(self, game, coords, height, resources)
         self.rect = self.image.get_rect()
         self.rect.topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE)
+        self.resistance = WATER_COOLDOWN
 
     # Updates the tile's properties
     def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
             self.image.fill((0, 66, 146))
-        if(mapmode == RESOURCE_MAP):
-            self.image.fill((0, self.food, self.water))
-        if(mapmode == FOOD_MAP):
-            self.image.fill((0, self.food, 0))
-        if(mapmode == WATER_MAP):
-            self.image.fill((0, 0, self.water))
-        if(mapmode == WOOD_MAP):
-            self.image.fill((0, 0, 0))
-        if(mapmode == STONE_MAP):
-            self.image.fill((self.stone, self.stone, self.stone))
+        elif(mapmode == RESOURCE_MAP):
+            self.image.fill((self.resources[WOOD], self.resources[FOOD],
+            self.resources[WATER]))
+        elif(mapmode == FOOD_MAP):
+            self.image.fill((0, self.resources[FOOD], 0))
+        elif(mapmode == WATER_MAP):
+            self.image.fill((0, 0, self.resources[WATER]))
+        elif(mapmode == WOOD_MAP):
+            self.image.fill((self.resources[WOOD], 0, 0))
+        elif(mapmode == STONE_MAP):
+            self.image.fill((self.resources[STONE], self.resources[STONE],
+            self.resources[STONE]))
 
 class DeepWaterTile(Tile):
     'Deep Ocean tile to mark water'
@@ -83,22 +83,25 @@ class DeepWaterTile(Tile):
         Tile.__init__(self, game, coords, height, resources)
         self.rect = self.image.get_rect()
         self.rect.topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE)
+        self.resistance = DEEP_WATER_COOLDOWN
 
     # Updates the tile's properties
     def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
             self.image.fill((0, 46, 136))
-        if(mapmode == RESOURCE_MAP):
-            self.image.fill((0, self.food, self.water))
-        if(mapmode == FOOD_MAP):
-            self.image.fill((0, self.food, 0))
-        if(mapmode == WATER_MAP):
-            self.image.fill((0, 0, self.water))
-        if(mapmode == WOOD_MAP):
-            self.image.fill((0, 0, 0))
-        if(mapmode == STONE_MAP):
-            self.image.fill((self.stone, self.stone, self.stone))
+        elif(mapmode == RESOURCE_MAP):
+            self.image.fill((self.resources[WOOD], self.resources[FOOD],
+            self.resources[WATER]))
+        elif(mapmode == FOOD_MAP):
+            self.image.fill((0, self.resources[FOOD], 0))
+        elif(mapmode == WATER_MAP):
+            self.image.fill((0, 0, self.resources[WATER]))
+        elif(mapmode == WOOD_MAP):
+            self.image.fill((self.resources[WOOD], 0, 0))
+        elif(mapmode == STONE_MAP):
+            self.image.fill((self.resources[STONE], self.resources[STONE],
+            self.resources[STONE]))
 
 class PlainTile(Tile):
     'Land tile to mark plains'
@@ -109,22 +112,25 @@ class PlainTile(Tile):
         Tile.__init__(self, game, coords, height, resources)
         self.rect = self.image.get_rect()
         self.rect.topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE)
+        self.resistance = PLAINS_COOLDOWN
 
     # Updates the tile's properties
     def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
             self.image.fill((116, 196, 116))
-        if(mapmode == RESOURCE_MAP):
-            self.image.fill((self.wood, self.food, self.water))
-        if(mapmode == FOOD_MAP):
-            self.image.fill((0, self.food, 0))
-        if(mapmode == WATER_MAP):
-            self.image.fill((0, 0, self.water))
-        if(mapmode == WOOD_MAP):
-            self.image.fill((self.wood, self.wood, 0))
-        if(mapmode == STONE_MAP):
-            self.image.fill((self.stone, self.stone, self.stone))
+        elif(mapmode == RESOURCE_MAP):
+            self.image.fill((self.resources[WOOD], self.resources[FOOD],
+            self.resources[WATER]))
+        elif(mapmode == FOOD_MAP):
+            self.image.fill((0, self.resources[FOOD], 0))
+        elif(mapmode == WATER_MAP):
+            self.image.fill((0, 0, self.resources[WATER]))
+        elif(mapmode == WOOD_MAP):
+            self.image.fill((self.resources[WOOD], 0, 0))
+        elif(mapmode == STONE_MAP):
+            self.image.fill((self.resources[STONE], self.resources[STONE],
+            self.resources[STONE]))
 
 class BeachTile(Tile):
     'Land tile to mark beach'
@@ -135,22 +141,25 @@ class BeachTile(Tile):
         Tile.__init__(self, game, coords, height, resources)
         self.rect = self.image.get_rect()
         self.rect.topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE)
+        self.resistance = BEACH_COOLDOWN
 
     # Updates the tile's properties
     def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
             self.image.fill((255, 238, 173))
-        if(mapmode == RESOURCE_MAP):
-            self.image.fill((0, self.food, self.water))
-        if(mapmode == FOOD_MAP):
-            self.image.fill((0, self.food, 0))
-        if(mapmode == WATER_MAP):
-            self.image.fill((0, 0, self.water))
-        if(mapmode == WOOD_MAP):
-            self.image.fill((0, 0, 0))
-        if(mapmode == STONE_MAP):
-            self.image.fill((self.stone, self.stone, self.stone))
+        elif(mapmode == RESOURCE_MAP):
+            self.image.fill((self.resources[WOOD], self.resources[FOOD],
+            self.resources[WATER]))
+        elif(mapmode == FOOD_MAP):
+            self.image.fill((0, self.resources[FOOD], 0))
+        elif(mapmode == WATER_MAP):
+            self.image.fill((0, 0, self.resources[WATER]))
+        elif(mapmode == WOOD_MAP):
+            self.image.fill((self.resources[WOOD], 0, 0))
+        elif(mapmode == STONE_MAP):
+            self.image.fill((self.resources[STONE], self.resources[STONE],
+            self.resources[STONE]))
 
 class JungleTile(Tile):
     'Land tile to mark jungle'
@@ -161,22 +170,25 @@ class JungleTile(Tile):
         Tile.__init__(self, game, coords, height, resources)
         self.rect = self.image.get_rect()
         self.rect.topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE)
+        self.resistance = JUNGLE_COOLDOWN
 
     # Updates the tile's properties
     def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
             self.image.fill((45, 116, 45))
-        if(mapmode == RESOURCE_MAP):
-            self.image.fill((self.wood, self.food, self.water))
-        if(mapmode == FOOD_MAP):
-            self.image.fill((0, self.food, 0))
-        if(mapmode == WATER_MAP):
-            self.image.fill((0, 0, self.water))
-        if(mapmode == WOOD_MAP):
-            self.image.fill((self.wood, 0, 0))
-        if(mapmode == STONE_MAP):
-            self.image.fill((self.stone, self.stone, self.stone))
+        elif(mapmode == RESOURCE_MAP):
+            self.image.fill((self.resources[WOOD], self.resources[FOOD],
+            self.resources[WATER]))
+        elif(mapmode == FOOD_MAP):
+            self.image.fill((0, self.resources[FOOD], 0))
+        elif(mapmode == WATER_MAP):
+            self.image.fill((0, 0, self.resources[WATER]))
+        elif(mapmode == WOOD_MAP):
+            self.image.fill((self.resources[WOOD], 0, 0))
+        elif(mapmode == STONE_MAP):
+            self.image.fill((self.resources[STONE], self.resources[STONE],
+            self.resources[STONE]))
 
 class MountainTile(Tile):
     'Land tile to mark jungle'
@@ -187,23 +199,26 @@ class MountainTile(Tile):
         Tile.__init__(self, game, coords, height, resources)
         self.rect = self.image.get_rect()
         self.rect.topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE)
+        self.resistance = MOUNTAIN_COOLDOWN
 
     # Updates the tile's properties
     def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
             self.image.fill((116, 116, 116))
-        if(mapmode == RESOURCE_MAP):
-            self.image.fill((self.stone, self.stone - self.wood, self.stone -
-            self.wood))
-        if(mapmode == FOOD_MAP):
-            self.image.fill((0, 0, 0))
-        if(mapmode == WATER_MAP):
-            self.image.fill((0, 0, 0))
-        if(mapmode == WOOD_MAP):
-            self.image.fill((self.wood, 0, 0))
-        if(mapmode == STONE_MAP):
-            self.image.fill((self.stone, self.stone, self.stone))
+        elif(mapmode == RESOURCE_MAP):
+            self.image.fill((self.resources[STONE],
+            self.resources[STONE] - self.resources[WOOD],
+            self.resources[STONE] - self.resources[WOOD]))
+        elif(mapmode == FOOD_MAP):
+            self.image.fill((0, self.resources[FOOD], 0))
+        elif(mapmode == WATER_MAP):
+            self.image.fill((0, 0, self.resources[WATER]))
+        elif(mapmode == WOOD_MAP):
+            self.image.fill((self.resources[WOOD], 0, 0))
+        elif(mapmode == STONE_MAP):
+            self.image.fill((self.resources[STONE], self.resources[STONE],
+            self.resources[STONE]))
 
 class SnowTile(Tile):
     'Land tile to mark jungle'
@@ -214,19 +229,22 @@ class SnowTile(Tile):
         Tile.__init__(self, game, coords, height, resources)
         self.rect = self.image.get_rect()
         self.rect.topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE)
+        self.resistance = SNOW_COOLDOWN
 
     # Updates the tile's properties
     def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
             self.image.fill((255, 255, 255))
-        if(mapmode == RESOURCE_MAP):
-            self.image.fill((self.stone, self.stone, self.water))
-        if(mapmode == FOOD_MAP):
-            self.image.fill((0, 0, 0))
-        if(mapmode == WATER_MAP):
-            self.image.fill((0, 0, self.water))
-        if(mapmode == WOOD_MAP):
-            self.image.fill((0, 0, 0))
-        if(mapmode == STONE_MAP):
-            self.image.fill((self.stone, self.stone, self.stone))
+        elif(mapmode == RESOURCE_MAP):
+            self.image.fill((self.resources[STONE], self.resources[STONE],
+            self.resources[WATER]))
+        elif(mapmode == FOOD_MAP):
+            self.image.fill((0, self.resources[FOOD], 0))
+        elif(mapmode == WATER_MAP):
+            self.image.fill((0, 0, self.resources[WATER]))
+        elif(mapmode == WOOD_MAP):
+            self.image.fill((self.resources[WOOD], 0, 0))
+        elif(mapmode == STONE_MAP):
+            self.image.fill((self.resources[STONE], self.resources[STONE],
+            self.resources[STONE]))

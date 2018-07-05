@@ -9,7 +9,7 @@ TITLE = "Programmer's Battlegrounds"
 
 # Constants for map generation
 ELEVATION_SEED = 574421234
-RESOURCE_SEED = int(sqrt(fabs(ELEVATION_SEED)) + pow(WIDTH, e))
+RESOURCE_SEED = int(sqrt(abs(ELEVATION_SEED)) + pow(WIDTH, e))
 MAP_SIZE = WIDTH / TILE_SIZE
 
 # Elevation Constants
@@ -52,7 +52,7 @@ FOOD_MAP = 2
 WATER_MAP = 3
 WOOD_MAP = 4
 STONE_MAP = 5
-DAY_LENGTH = 720
+DAY_LENGTH = 360
 ACTION_RATE = int(DAY_LENGTH / 180)
 MID_DAY = DAY_LENGTH / 2
 NIGHT = DAY_LENGTH
