@@ -6,8 +6,10 @@ Objectives and planned features: <br />
 - Random Resource Generation (90%) <br />
 - Random Biome Generation (90%)<br />
 - Weather Patterns and Day/Night cycle (0%)<br />
-- AI Players (50%)<br />
-- ???
+- AI Players (80%)<br />
+- Shrinking circle which restricts play area (0%)<br />
+- AI Combat (20%)<br />
+- ??? <br />
 
 # Keys
 0 - toggle elevation mapmode <br />
