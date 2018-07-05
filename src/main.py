@@ -12,7 +12,7 @@ def renderGrid(surface) :
     for x in range(0, WIDTH, TILE_SIZE) :
         pygame.draw.line(surface, (0, 0, 0), (x, 0), (x, HEIGHT))
     for y in range(0, HEIGHT, TILE_SIZE) :
-        pygame.draw.line(surface, (0, 0, 0), (0, y), (WIDTH, y))    
+        pygame.draw.line(surface, (0, 0, 0), (0, y), (WIDTH, y))
 
 def limit(n) :
     if(n < 0) :
@@ -136,7 +136,7 @@ def setNeighbors(cellMap):
             else:
                 cellMap[y][x].setLeft(cellMap[y][x - 1])
                 cellMap[y][x].setRight(cellMap[y][x + 1])
-                
+
 
 # ------------------------- Game Class ----------------------------
 
@@ -145,11 +145,11 @@ class Game():
     def __init__(self):
         pygame.init()
         pygame.mixer.init()
-        
+
         self.all_entities = pygame.sprite.LayeredDirty()
         self.all_alive = pygame.sprite.Group()
         self.all_dead = pygame.sprite.Group()
-        
+
         self.all_tiles = pygame.sprite.LayeredDirty()
         self.deep_water_tiles = pygame.sprite.Group()
         self.water_tiles = pygame.sprite.Group()
@@ -158,7 +158,7 @@ class Game():
         self.jungle_tiles = pygame.sprite.Group()
         self.mountain_tiles = pygame.sprite.Group()
         self.snow_tiles = pygame.sprite.Group()
-        
+
         self.win = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
@@ -218,7 +218,7 @@ class Game():
         self.playing = True
         while self.playing:
             self.time += 1
-            self.time %= 240
+            self.redraw = 1
             self.clock.tick(FPS)
             self.events()
             self.update()
@@ -226,8 +226,8 @@ class Game():
 
     # Game loop update
     def update(self):
-        self.all_entities.update(self.mapmode)
-        self.all_tiles.update(self.mapmode, self.redraw)
+        self.all_entities.update(self.mapmode, self.time)
+        self.all_tiles.update(self.mapmode, self.redraw, self.time)
         self.redraw = 0
 
     # Game loop event handler
@@ -280,6 +280,6 @@ while g.running:
     g.new()
     g.run()
     g.show_go()
-    
+
 # End the game
 pygame.quit()

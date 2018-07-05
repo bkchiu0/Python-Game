@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from settings import *
-from entities import *
+import entities
 import pygame
 pygame.init();
 
@@ -24,7 +24,8 @@ class Tile(ABC, pygame.sprite.DirtySprite):
         self.stone = resources[STONE]
 
     # Updates the tile's properties
-    def update(self, mapmode, dirty):
+    @abstractmethod
+    def update(self, mapmode, dirty, time):
         pass
 
     # Sets the top neighboring tile
@@ -58,7 +59,7 @@ class WaterTile(Tile):
         self.rect.topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE)
 
     # Updates the tile's properties
-    def update(self, mapmode, dirty):
+    def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
             self.image.fill((0, 66, 146))
@@ -84,7 +85,7 @@ class DeepWaterTile(Tile):
         self.rect.topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE)
 
     # Updates the tile's properties
-    def update(self, mapmode, dirty):
+    def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
             self.image.fill((0, 46, 136))
@@ -101,7 +102,7 @@ class DeepWaterTile(Tile):
 
 class PlainTile(Tile):
     'Land tile to mark plains'
-    
+
     def __init__(self, game, coords, height, resources):
         self.groups = game.all_tiles, game.plains_tiles
         pygame.sprite.DirtySprite.__init__(self, self.groups)
@@ -110,7 +111,7 @@ class PlainTile(Tile):
         self.rect.topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE)
 
     # Updates the tile's properties
-    def update(self, mapmode, dirty):
+    def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
             self.image.fill((116, 196, 116))
@@ -127,7 +128,7 @@ class PlainTile(Tile):
 
 class BeachTile(Tile):
     'Land tile to mark beach'
-    
+
     def __init__(self, game, coords, height, resources):
         self.groups = game.all_tiles, game.beach_tiles
         pygame.sprite.DirtySprite.__init__(self, self.groups)
@@ -136,7 +137,7 @@ class BeachTile(Tile):
         self.rect.topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE)
 
     # Updates the tile's properties
-    def update(self, mapmode, dirty):
+    def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
             self.image.fill((255, 238, 173))
@@ -153,7 +154,7 @@ class BeachTile(Tile):
 
 class JungleTile(Tile):
     'Land tile to mark jungle'
-    
+
     def __init__(self, game, coords, height, resources):
         self.groups = game.all_tiles, game.jungle_tiles
         pygame.sprite.DirtySprite.__init__(self, self.groups)
@@ -162,7 +163,7 @@ class JungleTile(Tile):
         self.rect.topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE)
 
     # Updates the tile's properties
-    def update(self, mapmode, dirty):
+    def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
             self.image.fill((45, 116, 45))
@@ -179,7 +180,7 @@ class JungleTile(Tile):
 
 class MountainTile(Tile):
     'Land tile to mark jungle'
-    
+
     def __init__(self, game, coords, height, resources):
         self.groups = game.all_tiles, game.mountain_tiles
         pygame.sprite.DirtySprite.__init__(self, self.groups)
@@ -188,7 +189,7 @@ class MountainTile(Tile):
         self.rect.topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE)
 
     # Updates the tile's properties
-    def update(self, mapmode, dirty):
+    def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
             self.image.fill((116, 116, 116))
@@ -206,7 +207,7 @@ class MountainTile(Tile):
 
 class SnowTile(Tile):
     'Land tile to mark jungle'
-    
+
     def __init__(self, game, coords, height, resources):
         self.groups = game.all_tiles, game.snow_tiles
         pygame.sprite.DirtySprite.__init__(self, self.groups)
@@ -215,7 +216,7 @@ class SnowTile(Tile):
         self.rect.topleft = (self.x * TILE_SIZE, self.y * TILE_SIZE)
 
     # Updates the tile's properties
-    def update(self, mapmode, dirty):
+    def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
             self.image.fill((255, 255, 255))
