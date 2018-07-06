@@ -7,7 +7,7 @@ Objectives and planned features: <br />
 - Random Biome Generation (90%)<br />
 - Weather Patterns and Day/Night cycle (0%)<br />
 - AI Players (80%)<br />
-- Shrinking circle which restricts play area (0%)<br />
+- Shrinking circle which restricts play area (80%)<br />
 - AI Combat (20%)<br />
 - ??? <br />
 
