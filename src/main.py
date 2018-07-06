@@ -151,6 +151,7 @@ class Game():
         self.all_dead = pygame.sprite.Group()
 
         self.all_tiles = pygame.sprite.LayeredDirty()
+        self.land_tiles = pygame.sprite.Group()
         self.deep_water_tiles = pygame.sprite.Group()
         self.water_tiles = pygame.sprite.Group()
         self.beach_tiles = pygame.sprite.Group()
@@ -169,10 +170,17 @@ class Game():
         self.running = True
         self.redraw = 1
         self.time = 0
+        self.center = (MAP_SIZE / 2, MAP_SIZE / 2)
+        self.radius = MAP_SIZE + 1
+        self.currRad = MAP_SIZE + 1
 
     # Used of loading any outside information
     def load_data(self):
         pass
+
+    # Calculates the manhattan distance between two coords
+    def manhattanDist(self, coord1, coord2):
+        return abs(coord1[0] - coord2[0]) + abs(coord1[1] - coord2[1])
 
     # Starts a new game
     def new(self):
@@ -181,6 +189,7 @@ class Game():
         self.all_alive.empty()
         self.all_dead.empty()
         self.all_tiles.empty()
+        self.land_tiles.empty()
         self.deep_water_tiles.empty()
         self.water_tiles.empty()
         self.beach_tiles.empty()
@@ -191,6 +200,9 @@ class Game():
         self.world = generateMap(self, self.enoise, self.rnoise)
         self.redraw = 1
         self.time = 0
+        self.center = (MAP_SIZE / 2, MAP_SIZE / 2)
+        self.radius = MAP_SIZE + 1
+        self.currRad = MAP_SIZE + 1
         self.addPlayers()
 
     # adds all the players in the world
@@ -226,6 +238,9 @@ class Game():
 
     # Game loop update
     def update(self):
+        if(self.time % ACTION_RATE == 0 and self.currRad > self.radius):
+            self.currRad -= 1
+            self.redraw = 1
         self.all_entities.update(self.mapmode, self.time)
         self.all_tiles.update(self.mapmode, self.redraw, self.time)
         self.redraw = 0
@@ -255,6 +270,15 @@ class Game():
         if(keys[pygame.K_5]):
             self.mapmode = STONE_MAP
             self.redraw = 1
+
+        if(self.time % DAY_LENGTH == 0 and (self.time // DAY_LENGTH) % 2 == 1):
+            tiles = self.land_tiles.sprites()
+            centerTile = tiles[random.randint(0, len(tiles) - 1)]
+            while(self.manhattanDist((centerTile.x, centerTile.y),
+            self.center) > self.radius // 2):
+                centerTile = tiles[random.randint(0, len(tiles) - 1)]
+            self.center = (centerTile.x, centerTile.y)
+            self.radius //= 2
 
     # Game Loop - draw
     def draw(self):

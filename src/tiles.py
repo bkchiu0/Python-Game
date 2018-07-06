@@ -19,6 +19,7 @@ class Tile(ABC, pygame.sprite.DirtySprite):
         self.height = height
         self.dirty = 1
         self.resources = resources
+        self.isGreyed = False
 
     # Updates the tile's properties
     @abstractmethod
@@ -60,7 +61,12 @@ class WaterTile(Tile):
     def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
-            self.image.fill((0, 66, 146))
+            if(self.isGreyed or self.game.manhattanDist((self.x, self.y),
+            self.game.center) > self.game.currRad):
+                self.image.fill((71, 71, 71))
+                self.isGreyed = True
+            else:
+                self.image.fill((0, 66, 146))
         elif(mapmode == RESOURCE_MAP):
             self.image.fill((self.resources[WOOD], self.resources[FOOD],
             self.resources[WATER]))
@@ -89,7 +95,12 @@ class DeepWaterTile(Tile):
     def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
-            self.image.fill((0, 46, 136))
+            if(self.isGreyed or self.game.manhattanDist((self.x, self.y),
+            self.game.center) > self.game.currRad):
+                self.image.fill((60, 60, 60))
+                self.isGreyed = True
+            else:
+                self.image.fill((0, 46, 136))
         elif(mapmode == RESOURCE_MAP):
             self.image.fill((self.resources[WOOD], self.resources[FOOD],
             self.resources[WATER]))
@@ -107,7 +118,7 @@ class PlainTile(Tile):
     'Land tile to mark plains'
 
     def __init__(self, game, coords, height, resources):
-        self.groups = game.all_tiles, game.plains_tiles
+        self.groups = game.all_tiles, game.plains_tiles, game.land_tiles
         pygame.sprite.DirtySprite.__init__(self, self.groups)
         Tile.__init__(self, game, coords, height, resources)
         self.rect = self.image.get_rect()
@@ -118,7 +129,12 @@ class PlainTile(Tile):
     def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
-            self.image.fill((116, 196, 116))
+            if(self.isGreyed or self.game.manhattanDist((self.x, self.y),
+            self.game.center) > self.game.currRad):
+                self.image.fill((143, 143, 143))
+                self.isGreyed = True
+            else:
+                self.image.fill((116, 196, 116))
         elif(mapmode == RESOURCE_MAP):
             self.image.fill((self.resources[WOOD], self.resources[FOOD],
             self.resources[WATER]))
@@ -136,7 +152,7 @@ class BeachTile(Tile):
     'Land tile to mark beach'
 
     def __init__(self, game, coords, height, resources):
-        self.groups = game.all_tiles, game.beach_tiles
+        self.groups = game.all_tiles, game.beach_tiles, game.land_tiles
         pygame.sprite.DirtySprite.__init__(self, self.groups)
         Tile.__init__(self, game, coords, height, resources)
         self.rect = self.image.get_rect()
@@ -147,7 +163,12 @@ class BeachTile(Tile):
     def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
-            self.image.fill((255, 238, 173))
+            if(self.isGreyed or self.game.manhattanDist((self.x, self.y),
+            self.game.center) > self.game.currRad):
+                self.image.fill((222, 222, 222))
+                self.isGreyed = True
+            else:
+                self.image.fill((255, 238, 173))
         elif(mapmode == RESOURCE_MAP):
             self.image.fill((self.resources[WOOD], self.resources[FOOD],
             self.resources[WATER]))
@@ -165,7 +186,7 @@ class JungleTile(Tile):
     'Land tile to mark jungle'
 
     def __init__(self, game, coords, height, resources):
-        self.groups = game.all_tiles, game.jungle_tiles
+        self.groups = game.all_tiles, game.jungle_tiles, game.land_tiles
         pygame.sprite.DirtySprite.__init__(self, self.groups)
         Tile.__init__(self, game, coords, height, resources)
         self.rect = self.image.get_rect()
@@ -176,7 +197,12 @@ class JungleTile(Tile):
     def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
-            self.image.fill((45, 116, 45))
+            if(self.isGreyed or self.game.manhattanDist((self.x, self.y),
+            self.game.center) > self.game.currRad):
+                self.image.fill((69, 69, 69))
+                self.isGreyed = True
+            else:
+                self.image.fill((45, 116, 45))
         elif(mapmode == RESOURCE_MAP):
             self.image.fill((self.resources[WOOD], self.resources[FOOD],
             self.resources[WATER]))
@@ -194,7 +220,7 @@ class MountainTile(Tile):
     'Land tile to mark jungle'
 
     def __init__(self, game, coords, height, resources):
-        self.groups = game.all_tiles, game.mountain_tiles
+        self.groups = game.all_tiles, game.mountain_tiles, game.land_tiles
         pygame.sprite.DirtySprite.__init__(self, self.groups)
         Tile.__init__(self, game, coords, height, resources)
         self.rect = self.image.get_rect()
@@ -205,7 +231,12 @@ class MountainTile(Tile):
     def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
-            self.image.fill((116, 116, 116))
+            if(self.isGreyed or self.game.manhattanDist((self.x, self.y),
+            self.game.center) > self.game.currRad):
+                self.image.fill((43, 43, 43))
+                self.isGreyed = True
+            else:
+                self.image.fill((116, 116, 116))
         elif(mapmode == RESOURCE_MAP):
             self.image.fill((self.resources[STONE],
             self.resources[STONE] - self.resources[WOOD],
@@ -224,7 +255,7 @@ class SnowTile(Tile):
     'Land tile to mark jungle'
 
     def __init__(self, game, coords, height, resources):
-        self.groups = game.all_tiles, game.snow_tiles
+        self.groups = game.all_tiles, game.snow_tiles, game.land_tiles
         pygame.sprite.DirtySprite.__init__(self, self.groups)
         Tile.__init__(self, game, coords, height, resources)
         self.rect = self.image.get_rect()
@@ -235,7 +266,12 @@ class SnowTile(Tile):
     def update(self, mapmode, dirty, time):
         self.dirty = dirty
         if(mapmode == ELEVATION_MAP):
-            self.image.fill((255, 255, 255))
+            if(self.isGreyed or self.game.manhattanDist((self.x, self.y),
+            self.game.center) > self.game.currRad):
+                self.image.fill((115, 115, 115))
+                self.isGreyed = True
+            else:
+                self.image.fill((255, 255, 255))
         elif(mapmode == RESOURCE_MAP):
             self.image.fill((self.resources[STONE], self.resources[STONE],
             self.resources[WATER]))
