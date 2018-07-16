@@ -171,6 +171,7 @@ class Game():
         self.redraw = 1
         self.time = 0
         self.center = (MAP_SIZE / 2, MAP_SIZE / 2)
+        self.nextCenter = self.getNewCenter()
         self.radius = MAP_SIZE + 1
         self.currRad = MAP_SIZE + 1
 
@@ -201,6 +202,7 @@ class Game():
         self.redraw = 1
         self.time = 0
         self.center = (MAP_SIZE / 2, MAP_SIZE / 2)
+        self.nextCenter = self.getNewCenter()
         self.radius = MAP_SIZE + 1
         self.currRad = MAP_SIZE + 1
         self.addPlayers()
@@ -271,14 +273,18 @@ class Game():
             self.mapmode = STONE_MAP
             self.redraw = 1
 
-        if(self.time % DAY_LENGTH == 0 and (self.time // DAY_LENGTH) % 2 == 1):
-            tiles = self.land_tiles.sprites()
-            centerTile = tiles[random.randint(0, len(tiles) - 1)]
-            while(self.manhattanDist((centerTile.x, centerTile.y),
-            self.center) > self.radius // 2):
-                centerTile = tiles[random.randint(0, len(tiles) - 1)]
-            self.center = (centerTile.x, centerTile.y)
+        if(self.time % DAY_LENGTH == 0 and (self.time // DAY_LENGTH) % 3 == 1):
+            self.center = self.nextCenter
             self.radius //= 2
+            self.nextCenter = self.getNewCenter()
+
+    def getNewCenter(self):
+        tiles = self.land_tiles.sprites()
+        centerTile = tiles[random.randint(0, len(tiles) - 1)]
+        while(self.manhattanDist((centerTile.x, centerTile.y),
+        self.center) > self.radius // 2):
+            centerTile = tiles[random.randint(0, len(tiles) - 1)]
+        return (centerTile.x, centerTile.y)
 
     # Game Loop - draw
     def draw(self):
