@@ -1,4 +1,6 @@
 from math import *
+import random
+import sys
 
 # Constants for the window display
 WIDTH = 800
@@ -8,8 +10,8 @@ TILE_SIZE = 5
 TITLE = "Programmer's Battlegrounds"
 
 # Constants for map generation
-ELEVATION_SEED = 574421234
-RESOURCE_SEED = int(sqrt(abs(ELEVATION_SEED)) + pow(WIDTH, e))
+ELEVATION_SEED = random.randint(-sys.maxsize - 1, sys.maxsize)
+RESOURCE_SEED = random.randint(-sys.maxsize - 1, sys.maxsize)
 MAP_SIZE = WIDTH / TILE_SIZE
 
 # Elevation Constants
@@ -39,7 +41,7 @@ PLAINS_COOLDOWN = 0
 JUNGLE_COOLDOWN = 2
 MOUNTAIN_COOLDOWN = 3
 SNOW_COOLDOWN = 4
-NUM_PLAYERS = 0
+NUM_PLAYERS = 25
 FOOD = 0
 WATER = 1
 WOOD = 2

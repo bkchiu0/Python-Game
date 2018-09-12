@@ -12,7 +12,7 @@ class Bot(pygame.sprite.DirtySprite):
     # int x, int y, int idVal
     # int velX, int velY, int accX, int accY
     def __init__(self, game, coords, team):
-        self.groups = game.all_entities, game.all_alive
+        self.groups = game.all_entities
         pygame.sprite.DirtySprite.__init__(self, self.groups)
         self.game = game
         self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
@@ -44,7 +44,8 @@ class Bot(pygame.sprite.DirtySprite):
     # Moves the bot in a direction
     def action(self):
         if(len(self.directions) == 0):
-            directions = self.fastFindPath((MAP_SIZE / 2, MAP_SIZE / 2))
+            directions = self.fastFindPath((random.randint(0, MAP_SIZE - 1),
+            random.randint(0, MAP_SIZE - 1)))
             self.directions += directions
         if(len(self.directions) != 0):
             if(self.directions[0] == 0):

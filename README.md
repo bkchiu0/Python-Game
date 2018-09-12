@@ -1,4 +1,7 @@
-# Python Game
+# Main EXE File <br />
+- Located in src\dist\main.exe <br />
+
+# Python Game <br />
 AI Bot battle royale <br />
 This game is currently a work in progress <br />
 Objectives and planned features: <br />
@@ -7,7 +10,7 @@ Objectives and planned features: <br />
 - Random Biome Generation (90%)<br />
 - Weather Patterns and Day/Night cycle (0%)<br />
 - AI Players (80%)<br />
-- Shrinking circle which restricts play area (80%)<br />
+- Shrinking circle which restricts play area (100%)<br />
 - AI Combat (20%)<br />
 - ??? <br />
 

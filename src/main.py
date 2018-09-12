@@ -143,13 +143,11 @@ def setNeighbors(cellMap):
 class Game():
     # Initialize game object fields
     def __init__(self):
+        self.running = True
         pygame.init()
         pygame.mixer.init()
 
         self.all_entities = pygame.sprite.LayeredDirty()
-        self.all_alive = pygame.sprite.Group()
-        self.all_dead = pygame.sprite.Group()
-
         self.all_tiles = pygame.sprite.LayeredDirty()
         self.land_tiles = pygame.sprite.Group()
         self.deep_water_tiles = pygame.sprite.Group()
@@ -159,21 +157,12 @@ class Game():
         self.jungle_tiles = pygame.sprite.Group()
         self.mountain_tiles = pygame.sprite.Group()
         self.snow_tiles = pygame.sprite.Group()
-
         self.win = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
         self.enoise = OpenSimplex(ELEVATION_SEED)
         self.rnoise = OpenSimplex(RESOURCE_SEED)
-        self.mapmode = ELEVATION_MAP
-        self.world = generateMap(self, self.enoise, self.rnoise)
-        self.running = True
-        self.redraw = 1
-        self.time = 0
-        self.center = (MAP_SIZE / 2, MAP_SIZE / 2)
-        self.nextCenter = self.getNewCenter()
-        self.radius = MAP_SIZE + 1
-        self.currRad = MAP_SIZE + 1
+        self.new()
 
     # Used of loading any outside information
     def load_data(self):
@@ -187,8 +176,6 @@ class Game():
     def new(self):
         self.mapmode = ELEVATION_MAP
         self.all_entities.empty()
-        self.all_alive.empty()
-        self.all_dead.empty()
         self.all_tiles.empty()
         self.land_tiles.empty()
         self.deep_water_tiles.empty()
@@ -202,9 +189,9 @@ class Game():
         self.redraw = 1
         self.time = 0
         self.center = (MAP_SIZE / 2, MAP_SIZE / 2)
-        self.nextCenter = self.getNewCenter()
         self.radius = MAP_SIZE + 1
         self.currRad = MAP_SIZE + 1
+        self.nextCenter = self.getNewCenter()
         self.addPlayers()
 
     # adds all the players in the world
@@ -222,7 +209,7 @@ class Game():
             self.all_entities.add(Bot(self, (x, y), ctr))
 
     def isValidSpawn(self, x, y):
-        for bot in self.all_alive.sprites():
+        for bot in self.all_entities.sprites():
             if(bot.x == x and bot.y == y):
                 return False
         return True
@@ -244,6 +231,7 @@ class Game():
             self.currRad -= 1
             self.redraw = 1
         self.all_entities.update(self.mapmode, self.time)
+        self.killOutside()
         self.all_tiles.update(self.mapmode, self.redraw, self.time)
         self.redraw = 0
 
@@ -278,6 +266,17 @@ class Game():
             self.radius //= 2
             self.nextCenter = self.getNewCenter()
 
+    # Kills all the sprites that are outside of the circle
+    def killOutside(self):
+        for sprite in self.all_entities:
+            if self.manhattanDist((sprite.x, sprite.y),
+            self.center) > self.currRad:
+                print("Bot " + str(sprite.team) + 
+                " has died outside the playzone.")
+                sprite.kill()
+
+
+    # Randomly generates a new centerTile for the next iteration
     def getNewCenter(self):
         tiles = self.land_tiles.sprites()
         centerTile = tiles[random.randint(0, len(tiles) - 1)]
